@@ -35,9 +35,29 @@ struct VSInput
 // 頂点シェーダーから出力するデータ
 struct PSInput
 {
-    float4 posH : SV_Position; // 頂点の座標(射影座標系)
-    float3 nrmW : TEXCOORD0; // 法線
+    float4 position : SV_POSITION;
+    float3 normal : NORMAL;
 };
+
+float4 main(PSInput input) : SV_TARGET
+{
+    // 法線を正規化
+    float3 N = normalize(input.normal);
+
+// ライトの方向
+float3 L = normalize(float3(0.0f, 1.0f, -1.0f));
+
+// 拡散光の計算
+float diffuse = max(0.0f, dot(N, L));
+
+// 拡散光の色
+float3 diffuseColor = float3(1.0f, 1.0f, 1.0f) * diffuse;
+
+// ピクセルカラー
+float3 pixelColor = diffuseColor;
+
+return float4(pixelColor, 1.0f);
+}
 
 // 頂点シェーダー
 PSInput VS(VSInput vin)
