@@ -33,9 +33,9 @@ namespace
     unique_ptr<GameObject> CreateSphere(Vector3 pos)
     {
         auto sphere = make_unique<GameObject>(u8"Sphere",
-            SphereRenderer::create<VertexPN>(u8"resource/VertexTest.hlsl"),
-//             CubeRenderer::create<VertexPN>(u8"resource/VertexTest.hlsl"),
-//             CubeRenderer::create<VertexPN>(u8"resource/PixelTest1.hlsl"),
+            // SphereRenderer::create<VertexPN>(u8"resource/VertexTest.hlsl"),
+            SphereRenderer::create<VertexPN>(u8"resource/PixelTest1.hlsl"),
+            // SphereRenderer::create<VertexPNT>(u8"resource/PixelTest2.hlsl", u8"resource/wood-2.png"),
             make_unique<SphereCollider>(Vector3::zero, 1.0f),
             make_unique<Rigidbody>()
         );
@@ -86,9 +86,9 @@ void MainGame::createMap()
             rb->gravityScale = 0;
             rb->mass = numeric_limits<float>::infinity();
             auto floor = make_unique<GameObject>(u8"床",
-                CubeRenderer::create<VertexPN>(u8"resource/VertexTest.hlsl"),
-//                CubeRenderer::create<VertexPN>(u8"resource/PixelTest1.hlsl"),
-//                CubeRenderer::create<VertexPNT>(floorMat),
+                // CubeRenderer::create<VertexPN>(u8"resource/VertexTest.hlsl"),
+                CubeRenderer::create<VertexPN>(u8"resource/PixelTest1.hlsl"),
+                // CubeRenderer::create<VertexPNT>(floorMat),
                 move(rb),
                 make_unique<AABBCollider>());
             floor->transform->localScale = Vector3(2, 2, 2);
