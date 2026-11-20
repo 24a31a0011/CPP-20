@@ -107,27 +107,42 @@ SamplerState sampler0 : register(s4);
 // ピクセルシェーダー
 half4 PS(PSInput In) : SV_Target0
 {
-    // テクスチャから色を取得
-    half4 albedo = texture0.Sample(sampler0, In.uv);
+      half4 albedo = texture0.Sample(sampler0, In.uv);
 
-    // 明示的に法線を正規化（モデルスケール非均等だと崩れるため）
-    half3 N = normalize(In.nrmW);
+// 明示的に法線を正規化（モデルスケール非均等だと崩れるため）
+half3 N = normalize(In.nrmW);
+half3 L = -directionW;
+half3 V = normalize(cameraPosW - In.posW);
+half3 H = normalize(L + V);
 
-    // ライトループ
-    half3 diffAccum = ambientColor; // 環境光
-    diffAccum += directionalColor * saturate(dot(N, -directionW)); // ディレクショナルライト
-    half NdotL, atten;
-    uint i;
+// ライトループ
+half3 diffAccum = ambientColor; // 環境光
+diffAccum += directionalColor * saturate(dot(N, L)); // ディレクショナルライト
 
-    // ポイントライト
-    [loop]
-    for (i = 0; i < pointLightCount; ++i)
-    {
-    }
+// ディレクショナルライトのスペキュラ
+half3 spec = 0;
+spec += directionalColor * pow(saturate(dot(N, H)), 1000);
+half NdotL, atten;
+uint i;
 
-    // カラー合成
-    half4 color = half4(diffAccum, 1) * albedo * (half4) baseColor;
+// ポイントライト
+[loop]
+for (i = 0; i < pointLightCount; ++i)
+{
+    // ポイントライトのディフューズ
+    L = normalize(pointLights[i].positionW - In.posW);
+    NdotL = dot(N, L);
+    atten = 1 - (length(pointLights[i].positionW - In.posW) * pointLights[i].rangeInv);
+    diffAccum += pointLights[i].color * saturate(atten) * saturate(NdotL);
+    H = normalize(L + V);
+    spec += pointLights[i].color * pow(saturate(dot(N, H)), 1000);
+}
 
-    // 最終カラーを出力
-    return color;
+// カラー合成
+diffAccum = step(0.6,diffAccum);
+half4 color = half4(diffAccum, 1) * albedo * (half4)baseColor;
+color += half4(spec, 1) * half4(baseColor);
+
+// 最終カラーを出力
+return color;
 }

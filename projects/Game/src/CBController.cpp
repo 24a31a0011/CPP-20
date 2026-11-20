@@ -27,7 +27,7 @@ namespace
 
     Color colorTable[] =
     {
-        Color(1, 0, 0),
+        Color(0.5, 0.3, 0.1),
         Color(1, 1, 0),
         Color(1, 0, 1),
         Color(0, 1, 1),
